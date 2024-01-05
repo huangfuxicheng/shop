@@ -3,8 +3,8 @@ import { useMemberStore } from '@/stores'
 import { http } from '@/utils/http'
 
 const memberStore = useMemberStore()
-const getData = () => {
-  return http({
+const getData = async () => {
+  const res = await http({
     method: 'GET',
     url: '/home/banner',
   })

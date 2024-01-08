@@ -26,7 +26,7 @@ export const getHomeHot = () => {
   })
 }
 
-export const getHomeGoodsGuessLike = (data: PageParams) => {
+export const getHomeGoodsGuessLike = (data?: PageParams) => {
   return http<PageResult<GuessItem>>({
     method: 'GET',
     url: '/home/goods/guessLike',

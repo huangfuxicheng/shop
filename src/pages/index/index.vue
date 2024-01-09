@@ -37,25 +37,34 @@ const isTriggered = ref<boolean>(false)
 const onRefresherrefresh = async () => {
   isTriggered.value = true
   guessRef.value?.resetData()
-  await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData(), guessRef.value?.getMore(),
+  await Promise.all([
+    getHomeBannerData(),
+    getHomeCategoryData(),
+    getHomeHotData(),
+    guessRef.value?.getMore(),
   ])
   isTriggered.value = false
 }
 
 const isLoading = ref<boolean>(false)
 onLoad(async () => {
-  isLoading.value =true
+  isLoading.value = true
   await Promise.all([getHomeBannerData(), getHomeCategoryData(), getHomeHotData()])
-  isLoading.value =false
+  isLoading.value = false
 })
 </script>
 
 <template>
   <CustomNavbar />
-  <scroll-view refresher-enabled @refresherrefresh="onRefresherrefresh" :refresher-triggered="isTriggered"
-               class="scroll-view" scroll-y
-               @scrolltolower="onScrolltolower">
-    <PageSketon v-if="isLoading"/>
+  <scroll-view
+    refresher-enabled
+    @refresherrefresh="onRefresherrefresh"
+    :refresher-triggered="isTriggered"
+    class="scroll-view"
+    scroll-y
+    @scrolltolower="onScrolltolower"
+  >
+    <PageSketon v-if="isLoading" />
     <template v-else>
       <XtxSwiper :list="bannerList" />
       <CategoryPanel :list="categoryList" />
@@ -74,6 +83,6 @@ page {
 }
 
 .scroll-view {
-  flex: 1
+  flex: 1;
 }
 </style>

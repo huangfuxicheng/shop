@@ -1,21 +1,40 @@
 <script setup lang="ts">
 import { getHomeBanner } from '@/services/home'
 import { onLoad } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import type { BannerItem } from '@/types/home'
+import { getCategoryTopAPI } from '@/services/category'
+import type { CategoryTopItem } from '@/types/category'
+import PageSketon from '@/pages/category/components/PageSketon.vue'
 
 const bannerList = ref<BannerItem[]>([])
 const getHomeBannerData = async () => {
   const res = await getHomeBanner(2)
   bannerList.value = res.result
 }
+
+const categoryTopList = ref<CategoryTopItem[]>([])
+const activeIndex = ref(0)
+const getCategoryTopAPIData = async () => {
+  const res = await getCategoryTopAPI()
+  categoryTopList.value = res.result
+}
+
+// 提取当前二级分类数据
+const subCategoryList = computed(() => {
+  return categoryTopList.value[activeIndex.value]?.children || []
+})
+
+// 是否数据加载完毕
+const isFinish = ref(false)
 onLoad(() => {
-  getHomeBannerData()
+  Promise.all([getHomeBannerData(), getCategoryTopAPIData()])
+  isFinish.value = true
 })
 </script>
 
 <template>
-  <view class="viewport">
+  <view v-if="isFinish" class="viewport">
     <!-- 搜索框 -->
     <view class="search">
       <view class="input">
@@ -26,8 +45,14 @@ onLoad(() => {
     <view class="categories">
       <!-- 左侧：一级分类 -->
       <scroll-view class="primary" scroll-y>
-        <view v-for="(item, index) in 10" :key="item" class="item" :class="{ active: index === 0 }">
-          <text class="name"> 居家 </text>
+        <view
+          v-for="(item, index) in categoryTopList"
+          :key="item.id"
+          class="item"
+          :class="{ active: index === activeIndex }"
+          @tap="activeIndex = index"
+        >
+          <text class="name"> {{ item.name }} </text>
         </view>
       </scroll-view>
       <!-- 右侧：二级分类 -->
@@ -35,27 +60,27 @@ onLoad(() => {
         <!-- 焦点图 -->
         <XtxSwiper class="banner" :list="bannerList" />
         <!-- 内容区域 -->
-        <view class="panel" v-for="item in 3" :key="item">
+        <view class="panel" v-for="item in subCategoryList" :key="item.id">
           <view class="title">
-            <text class="name">宠物用品</text>
+            <text class="name">{{ item.name }}</text>
             <navigator class="more" hover-class="none">全部</navigator>
           </view>
           <view class="section">
             <navigator
-              v-for="goods in 4"
-              :key="goods"
+              v-for="goods in item.goods"
+              :key="goods.id"
               class="goods"
               hover-class="none"
-              :url="`/pages/goods/goods?id=`"
+              :url="`/pages/goods/goods?id=${goods.id}`"
             >
               <image
                 class="image"
-                src="https://yanxuan-item.nosdn.127.net/674ec7a88de58a026304983dd049ea69.jpg"
+                :src="goods.picture"
               ></image>
-              <view class="name ellipsis">木天蓼逗猫棍</view>
+              <view class="name ellipsis">{{ goods.name }}</view>
               <view class="price">
                 <text class="symbol">¥</text>
-                <text class="number">16.00</text>
+                <text class="number">{{ goods.price }}</text>
               </view>
             </navigator>
           </view>
@@ -63,6 +88,7 @@ onLoad(() => {
       </scroll-view>
     </view>
   </view>
+  <PageSketon v-else />
 </template>
 
 <style lang="scss">

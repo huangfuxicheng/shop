@@ -1,4 +1,5 @@
 import { http } from '@/utils/http'
+import type { GoodsResult } from '@/types/goods'
 
 /**
  * 商品详情
@@ -6,7 +7,7 @@ import { http } from '@/utils/http'
  * @author <a href="middlings@qq.com" rel="nofollow">middlings</a>
  */
 export const getGoodsById = (id: string) => {
-  return http({
+  return http<GoodsResult>({
     method: 'GET',
     url: '/goods',
     data: {

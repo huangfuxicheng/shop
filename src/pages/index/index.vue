@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import CustomNavbar from '@/pages/index/components/CustomNavbar.vue'
-import { getHomeBanner, getHomeCategory, getHomeGoodsGuessLike, getHomeHot } from '@/services/home'
+import { getHomeBanner, getHomeCategory, getHomeHot } from '@/services/home'
 import { ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home'
 import CategoryPanel from '@/pages/index/components/CategoryPanel.vue'
 import HotPanel from '@/pages/index/components/HotPanel.vue'
 import XtxGuess from '@/components/XtxGuess.vue'
-import type { XtxGuessInstance } from '@/types/component'
 import PageSketon from '@/pages/index/components/PageSketon.vue'
 import { useGuessList } from '@/composables'
 

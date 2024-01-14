@@ -9,6 +9,7 @@ import HotPanel from '@/pages/index/components/HotPanel.vue'
 import XtxGuess from '@/components/XtxGuess.vue'
 import type { XtxGuessInstance } from '@/types/component'
 import PageSketon from '@/pages/index/components/PageSketon.vue'
+import { useGuessList } from '@/composables'
 
 const bannerList = ref<BannerItem[]>([])
 const getHomeBannerData = async () => {
@@ -28,10 +29,7 @@ const getHomeHotData = async () => {
   hotList.value = res.result
 }
 
-const guessRef = ref<XtxGuessInstance>()
-const onScrolltolower = () => {
-  guessRef.value?.getMore()
-}
+const { guessRef, onScrolltolower } = useGuessList()
 
 const isTriggered = ref<boolean>(false)
 const onRefresherrefresh = async () => {

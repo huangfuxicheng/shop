@@ -29,6 +29,6 @@ export const SimpleLogin = (phoneNumber: string) => {
     url: '/login/wxMin/simple',
     data: {
       phoneNumber,
-    }
+    },
   })
 }

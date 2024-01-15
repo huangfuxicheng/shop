@@ -8,7 +8,7 @@ import { useMemberStore } from '@/stores'
 
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
-const profile = ref<ProfileDetail>({} as ProfileDetail)
+const profile = ref({} as ProfileDetail)
 const getMemberProfileData = async () => {
   const res = await getMemberProfile()
   profile.value = res.result
@@ -47,6 +47,7 @@ const onSubmit = async () => {
   const res = await putMemberProfile({
     nickname: profile.value.nickname,
     gender: profile.value.gender,
+    birthday: profile.value.birthday,
   })
   memberStore.profile!.nickname = res.result.nickname
   uni.showToast({ icon: 'success', title: '保存成功' })
@@ -57,6 +58,10 @@ const onSubmit = async () => {
 
 const onGenderChange: UniHelper.RadioGroupOnChange = (e) => {
   profile.value.gender = e.detail.value as Gender
+}
+
+const onBirthdayChange: UniHelper.DatePickerOnChange = (e) => {
+  profile.value!.birthday = e.detail.value
 }
 </script>
 
@@ -102,6 +107,7 @@ const onGenderChange: UniHelper.RadioGroupOnChange = (e) => {
         <view class="form-item">
           <text class="label">生日</text>
           <picker
+            @change="onBirthdayChange"
             class="picker"
             mode="date"
             start="1900-01-01"

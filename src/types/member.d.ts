@@ -20,10 +20,10 @@ export type LoginResult = BaseProfile & {
 }
 
 export type ProfileDetail = BaseProfile & {
-  birthday: string
-  fullLocation: string
-  gender: string
-  profession: string
+  birthday?: string
+  fullLocation?: string
+  gender?: Gender
+  profession?: string
 }
 
 export type Gender = '男' | '女'

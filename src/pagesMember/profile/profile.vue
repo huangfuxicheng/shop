@@ -1,13 +1,14 @@
 <script setup lang="ts">
 // 获取屏幕边界到安全区域距离
-import { getMemberProfile } from '@/services/profile'
+import { getMemberProfile, putMemberProfile } from '@/services/profile'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
-import type { ProfileDetail } from '@/types/member'
+import type { Gender, ProfileDetail } from '@/types/member'
+import { useMemberStore } from '@/stores'
 
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
-const profile = ref<ProfileDetail>()
+const profile = ref<ProfileDetail>({} as ProfileDetail)
 const getMemberProfileData = async () => {
   const res = await getMemberProfile()
   profile.value = res.result
@@ -17,6 +18,7 @@ onLoad(() => {
   getMemberProfileData()
 })
 
+const memberStore = useMemberStore()
 const onAvatarChange = () => {
   uni.chooseMedia({
     count: 1,
@@ -30,6 +32,7 @@ const onAvatarChange = () => {
         success(res) {
           if (res.statusCode === 200) {
             profile.value!.avatar = JSON.parse(res.data).result.avatar
+            memberStore.profile!.avatar = JSON.parse(res.data).result.avatar
             uni.showToast({ icon: 'success', title: '更新成功' })
           } else {
             uni.showToast({ icon: 'error', title: '出现错误' })
@@ -38,6 +41,22 @@ const onAvatarChange = () => {
       })
     },
   })
+}
+
+const onSubmit = async () => {
+  const res = await putMemberProfile({
+    nickname: profile.value.nickname,
+    gender: profile.value.gender,
+  })
+  memberStore.profile!.nickname = res.result.nickname
+  uni.showToast({ icon: 'success', title: '保存成功' })
+  setTimeout(() => {
+    uni.navigateBack()
+  }, 400)
+}
+
+const onGenderChange: UniHelper.RadioGroupOnChange = (e) => {
+  profile.value.gender = e.detail.value as Gender
 }
 </script>
 
@@ -65,11 +84,11 @@ const onAvatarChange = () => {
         </view>
         <view class="form-item">
           <text class="label">昵称</text>
-          <input class="input" type="text" placeholder="请填写昵称" :value="profile?.nickname" />
+          <input class="input" type="text" placeholder="请填写昵称" v-model="profile.nickname" />
         </view>
         <view class="form-item">
           <text class="label">性别</text>
-          <radio-group>
+          <radio-group @change="onGenderChange">
             <label class="radio">
               <radio value="男" color="#27ba9b" :checked="profile?.gender === '男'" />
               男
@@ -106,7 +125,7 @@ const onAvatarChange = () => {
         </view>
       </view>
       <!-- 提交按钮 -->
-      <button class="form-button">保 存</button>
+      <button class="form-button" @tap="onSubmit">保 存</button>
     </view>
   </view>
 </template>

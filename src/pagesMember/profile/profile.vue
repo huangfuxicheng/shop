@@ -44,10 +44,14 @@ const onAvatarChange = () => {
 }
 
 const onSubmit = async () => {
+  const { nickname, gender, birthday } = profile.value
   const res = await putMemberProfile({
-    nickname: profile.value.nickname,
-    gender: profile.value.gender,
-    birthday: profile.value.birthday,
+    nickname,
+    gender,
+    birthday,
+    provinceCode: fullLocationCode[0] || undefined,
+    cityCode: fullLocationCode[1] || undefined,
+    countyCode: fullLocationCode[2] || undefined,
   })
   memberStore.profile!.nickname = res.result.nickname
   uni.showToast({ icon: 'success', title: '保存成功' })
@@ -62,6 +66,12 @@ const onGenderChange: UniHelper.RadioGroupOnChange = (e) => {
 
 const onBirthdayChange: UniHelper.DatePickerOnChange = (e) => {
   profile.value!.birthday = e.detail.value
+}
+
+let fullLocationCode = ['', '', '']
+const onFullLocationChange: UniHelper.RegionPickerOnChange = (e) => {
+  profile.value.fullLocation = e.detail.value.join(' ')
+  fullLocationCode = e.detail.code!
 }
 </script>
 
@@ -120,7 +130,8 @@ const onBirthdayChange: UniHelper.DatePickerOnChange = (e) => {
         </view>
         <view class="form-item">
           <text class="label">城市</text>
-          <picker class="picker" mode="region" :value="profile?.fullLocation?.split(' ')">
+          <picker @change="onFullLocationChange" class="picker" mode="region"
+                  :value="profile?.fullLocation?.split(' ')">
             <view v-if="profile?.fullLocation">{{ profile?.fullLocation }}</view>
             <view class="placeholder" v-else>请选择城市</view>
           </picker>

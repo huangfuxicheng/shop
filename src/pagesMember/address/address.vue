@@ -10,7 +10,7 @@ const getMemberAddressAPIData = async () => {
   addressList.value = res.result
 }
 
-onShow(()=>{
+onShow(() => {
   getMemberAddressAPIData()
 })
 </script>
@@ -25,11 +25,11 @@ onShow(()=>{
           <view class="item" v-for="item in addressList" :key="item.id">
             <view class="item-content">
               <view class="user">
-                {{item.receiver}}
+                {{ item.receiver }}
                 <text class="contact">{{ item.contact }}</text>
                 <text v-if="item.isDefault" class="badge">默认</text>
               </view>
-              <view class="locate">{{ item.fullLocation }} {{ item.address}}</view>
+              <view class="locate">{{ item.fullLocation }} {{ item.address }}</view>
               <navigator
                 class="edit"
                 hover-class="none"

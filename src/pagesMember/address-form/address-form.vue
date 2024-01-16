@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { postMemberAddress } from '@/services/address'
+import { getMemberAddressById, postMemberAddress, putMemberAddressById } from '@/services/address'
+import { onLoad } from '@dcloudio/uni-app'
+import type { AddressItem } from '@/types/address'
 
 // 表单数据
 const form = ref({
@@ -14,7 +16,7 @@ const form = ref({
   isDefault: 0, // 默认地址，1为是，0为否
 })
 
-const query = defineProps<{ id: string }>()
+const query = defineProps<{ id?: string }>()
 
 const onRegionChange: UniHelper.RegionPickerOnChange = (e) => {
   form.value.fullLocation = e.detail.value.join(' ')
@@ -26,9 +28,27 @@ const onSwitchChange: UniHelper.SwitchOnChange = (e) => {
   form.value.isDefault = e.detail.value ? 1 : 0
 }
 
+const getMemberAddressByIdData = async () => {
+  if (query.id) {
+    const res = await getMemberAddressById(query.id)
+    Object.assign(form.value, res.result)
+  }
+}
+
+onLoad(() => {
+  getMemberAddressByIdData()
+})
 const onSubmit = async () => {
-  await postMemberAddress(form.value)
-  uni.showToast({ icon: 'success', title: '添加成功' })
+  // 判断当前页面是否有地址 id
+  if (query.id) {
+    // 修改地址请求
+    await putMemberAddressById(query.id, form.value)
+  } else {
+    // 新建地址请求
+    await postMemberAddress(form.value)
+  }
+  // 成功提示
+  uni.showToast({ icon: 'success', title: query.id ? '修改成功' : '添加成功' })
   setTimeout(() => {
     uni.navigateBack()
   }, 500)
@@ -71,7 +91,6 @@ uni.setNavigationBarTitle({ title: query.id ? '修改地址' : '新增地址' })
   </view>
   <!-- 提交按钮 -->
   <button class="button" @tap="onSubmit">保存并使用</button>
-  {{ form }}
 </template>
 
 <style lang="scss">

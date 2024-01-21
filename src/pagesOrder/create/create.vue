@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
+import { getMemberOrderPreAPI, getMemberOrderPreNowAPI, postMemberOrderAPI } from '@/services/order'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
+import { useAddressStore } from '@/stores/modules/address'
+import type { AddressItem } from '@/types/address'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -50,19 +52,42 @@ onLoad(() => {
   getMemberOrderPreData()
 })
 
+const addressStore = useAddressStore()
+const selectedAddress = computed((): AddressItem | undefined => {
+  return addressStore.selectedAddress || orderPre?.value?.userAddresses.find((v) => v.isDefault)
+})
+
+// 提交订单
+const onOrderSubmit = async () => {
+  // 没有收货地址提醒
+  if (!selectedAddress.value?.id) {
+    return uni.showToast({ icon: 'none', title: '请选择收货地址' })
+  }
+  // 发送请求
+  const res = await postMemberOrderAPI({
+    addressId: selectedAddress.value?.id,
+    buyerMessage: buyerMessage.value,
+    deliveryTimeType: activeDelivery.value.type,
+    goods: orderPre.value!.goods.map((v) => ({ count: v.count, skuId: v.skuId })),
+    payChannel: 2,
+    payType: 1,
+  })
+  // 关闭当前页面，跳转到订单详情，传递订单id
+  uni.redirectTo({ url: `/pagesOrder/detail/detail?id=${res.result.id}` })
+}
 </script>
 
 <template>
   <scroll-view scroll-y class="viewport">
     <!-- 收货地址 -->
     <navigator
-      v-if="false"
+      v-if="selectedAddress"
       class="shipment"
       hover-class="none"
       url="/pagesMember/address/address?from=order"
     >
-      <view class="user"> 张三 13333333333</view>
-      <view class="address"> 广东省 广州市 天河区 黑马程序员3</view>
+      <view class="user"> {{ selectedAddress.receiver }} {{ selectedAddress.contact }}</view>
+      <view class="address"> {{ selectedAddress.fullLocation }} {{ selectedAddress.address }}</view>
       <text class="icon icon-right"></text>
     </navigator>
     <navigator
@@ -124,7 +149,7 @@ onLoad(() => {
       </view>
       <view class="item">
         <text class="text">运费:</text>
-        <text class="number symbol">{{ orderPre?.summary.postFee.toFixed(2 )}}</text>
+        <text class="number symbol">{{ orderPre?.summary.postFee.toFixed(2) }}</text>
       </view>
     </view>
   </scroll-view>
@@ -134,7 +159,9 @@ onLoad(() => {
     <view class="total-pay symbol">
       <text class="number">{{ orderPre?.summary.totalPayPrice.toFixed(2) }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }"> 提交订单</view>
+    <view class="button" :class="{ disabled: !selectedAddress?.id }" @tap="onOrderSubmit">
+      提交订单</view
+    >
   </view>
 </template>
 

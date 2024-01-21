@@ -95,6 +95,10 @@ const onAddCart = async (e: SkuPopupEvent) => {
   uni.showToast({ icon: 'success', title: '添加成功' })
   isShowSku.value = false
 }
+
+const onBuyNow = (ev: SkuPopupEvent) => {
+  uni.navigateTo({ url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}` })
+}
 </script>
 
 <template>
@@ -111,6 +115,7 @@ const onAddCart = async (e: SkuPopupEvent) => {
       backgroundColor: '#E9F8F5',
     }"
     @add-cart="onAddCart"
+    @buy-now="onBuyNow"
   />
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->

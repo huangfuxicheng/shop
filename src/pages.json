@@ -11,7 +11,8 @@
     {
       "path": "pages/index/index",
       "style": {
-        "navigationStyle": "custom", // 隐藏默认导航
+        "navigationStyle": "custom",
+        // 隐藏默认导航
         "navigationBarTextStyle": "white",
         "navigationBarTitleText": "首页"
       }
@@ -19,7 +20,8 @@
     {
       "path": "pages/my/my",
       "style": {
-        "navigationStyle": "custom", // 隐藏默认导航
+        "navigationStyle": "custom",
+        // 隐藏默认导航
         "navigationBarTextStyle": "white",
         "navigationBarTitleText": "我的"
       }
@@ -114,23 +116,36 @@
         {
           "path": "profile/profile",
           "style": {
-            "navigationStyle": "custom", // 隐藏默认导航
+            "navigationStyle": "custom",
+            // 隐藏默认导航
             "navigationBarTextStyle": "white",
             "navigationBarTitleText": "个人信息"
           }
+        },
+        {
+          "path": "address/address",
+          "style": {
+            "navigationBarTitleText": "地址管理"
+          }
+        },
+        {
+          "path": "address-form/address-form",
+          "style": {
+            "navigationBarTitleText": ""
+          }
         }
-        ,
+      ]
+    },
+    {
+      // 子包的根目录
+      "root": "pagesOrder",
+      // 页面路径和窗口表现
+      "pages": [
         {
-  "path": "address/address",
+  "path": "create/create",
   "style": {
-    "navigationBarTitleText": "地址管理"
-  }
-}
-        ,
-        {
-  "path": "address-form/address-form",
-  "style": {
-    "navigationBarTitleText": ""
+    "navigationBarTitleText": "填写页面",
+    "enablePullDownRefresh": true
   }
 }
       ]
@@ -139,8 +154,10 @@
   // 分包预下载规则
   "preloadRule": {
     "pages/my/my": {
-      "network": "all", // [!code ++]
-      "packages": ["pagesMember"] // [!code ++]
+      "network": "all",
+      "packages": [
+        "pagesMember"
+      ]
     }
   }
 }

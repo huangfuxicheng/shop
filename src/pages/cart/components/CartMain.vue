@@ -80,6 +80,7 @@ const gotoPayment = () => {
       title: '请选择商品',
     })
   }
+  uni.navigateTo({ url: '/pagesOrder/create/create' })
 }
 </script>
 

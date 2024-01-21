@@ -142,20 +142,21 @@
       // 页面路径和窗口表现
       "pages": [
         {
-  "path": "create/create",
-  "style": {
-    "navigationBarTitleText": "填写页面",
-    "enablePullDownRefresh": true
-  }
-}
-        ,
+          "path": "create/create",
+          "style": {
+            "navigationBarTitleText": "填写页面",
+            "enablePullDownRefresh": true
+          }
+        },
         {
-  "path": "detail/detail",
-  "style": {
-    "navigationBarTitleText": "订单详情",
-    "enablePullDownRefresh": true
-  }
-}
+          "path": "detail/detail",
+          "style": {
+            "navigationBarTitleText": "订单详情",
+            "navigationStyle": "custom",
+            // 隐藏默认导航
+            "navigationBarTextStyle": "white"
+          }
+        }
       ]
     }
   ],

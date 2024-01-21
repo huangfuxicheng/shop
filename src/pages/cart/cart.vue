@@ -8,7 +8,7 @@ import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/
 
 const memberStore = useMemberStore()
 
-const cartList = ref<CartItem[]>()
+const cartList = ref<CartItem[]>([])
 const getMemberCartData = async () => {
   const res = await getMemberCart()
   cartList.value = res.result
@@ -55,6 +55,31 @@ const onChangeSelectedAll = () => {
     item.selected = _isSelectedAll
   })
   putMemberCartSelectedAPI({ selected: _isSelectedAll })
+}
+
+const selectedCartList = computed(() => {
+  return cartList.value?.filter((v) => v.selected)
+})
+
+const selectedCartListCount = computed(() => {
+  return selectedCartList.value?.reduce((curr, n) => {
+    return curr + n.count
+  }, 0)
+})
+
+const selectedCartListMoney = computed(() => {
+  return selectedCartList.value.reduce((curr, next) => {
+      return curr + next.count * next.nowPrice
+    }, 0).toFixed(2)
+})
+
+const gotoPayment = () => {
+  if (selectedCartListCount.value === 0) {
+    return uni.showToast({
+      icon: 'none',
+      title: '请选择商品',
+    })
+  }
 }
 </script>
 
@@ -132,9 +157,11 @@ const onChangeSelectedAll = () => {
       <view class="toolbar">
         <text @tap="onChangeSelectedAll" class="all" :class="{ checked: isSelectedAll }">全选</text>
         <text class="text">合计:</text>
-        <text class="amount">100</text>
+        <text class="amount">{{ selectedCartListMoney }}</text>
         <view class="button-grounp">
-          <view class="button payment-button" :class="{ disabled: true }"> 去结算(10)</view>
+          <view @tap="gotoPayment" class="button payment-button" :class="{ disabled: selectedCartListCount === 0 }">
+            去结算({{ selectedCartListCount }})
+          </view>
         </view>
       </view>
     </template>

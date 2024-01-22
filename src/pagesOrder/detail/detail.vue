@@ -77,6 +77,10 @@ const getMemberOrderByIdData = async () => {
 onLoad(() => {
   getMemberOrderByIdData()
 })
+
+const onTimeUp = () => {
+  order.value!.orderState = OrderState.YiQuXiao
+}
 </script>
 
 <template>
@@ -103,7 +107,14 @@ onLoad(() => {
           <view class="tips">
             <text class="money">应付金额: ¥ 99.00</text>
             <text class="time">支付剩余</text>
-            00 时 29 分 59 秒
+            <uni-countdown
+              :second="order.countdown"
+              @timeup="onTimeUp"
+              color="#fff"
+              :show-day="false"
+              splitor-color="#fff"
+              :show-colon="false"
+              />
           </view>
           <view class="button">去支付</view>
         </template>

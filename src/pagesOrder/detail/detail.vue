@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { useGuessList } from '@/composables'
 import { ref } from 'vue'
-import { onReady } from '@dcloudio/uni-app'
+import { onLoad, onReady } from '@dcloudio/uni-app'
+import type { OrderResult } from '@/types/order'
+import { getMemberOrderByIdAPI } from '@/services/order'
+import { OrderState, orderStateList } from '@/services/constants'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -65,24 +68,37 @@ onReady(() => {
   })
 })
 
+const order = ref<OrderResult>()
+const getMemberOrderByIdData = async () => {
+  const res = await getMemberOrderByIdAPI(query.id)
+  order.value = res.result
+}
+
+onLoad(() => {
+  getMemberOrderByIdData()
+})
 </script>
 
 <template>
   <!-- 自定义导航栏: 默认透明不可见, scroll-view 滚动到 50 时展示 -->
   <view class="navbar" :style="{ paddingTop: safeAreaInsets?.top + 'px' }">
     <view class="wrap">
-      <navigator v-if="true" open-type="navigateBack" class="back icon-left"></navigator>
+      <navigator
+        v-if="pages.length > 1"
+        open-type="navigateBack"
+        class="back icon-left"
+      ></navigator>
       <navigator v-else url="/pages/index/index" open-type="switchTab" class="back icon-home">
       </navigator>
       <view class="title">订单详情</view>
     </view>
   </view>
   <scroll-view scroll-y class="viewport" id="scroller" @scrolltolower="onScrolltolower">
-    <template v-if="true">
+    <template v-if="order">
       <!-- 订单状态 -->
       <view class="overview" :style="{ paddingTop: safeAreaInsets!.top + 20 + 'px' }">
         <!-- 待付款状态:展示去支付按钮和倒计时 -->
-        <template v-if="true">
+        <template v-if="order?.orderState === OrderState.DaiFuKuan">
           <view class="status icon-clock">等待付款</view>
           <view class="tips">
             <text class="money">应付金额: ¥ 99.00</text>
@@ -94,7 +110,7 @@ onReady(() => {
         <!-- 其他订单状态:展示再次购买按钮 -->
         <template v-else>
           <!-- 订单状态文字 -->
-          <view class="status"> 待付款 </view>
+          <view class="status"> {{ orderStateList[order.orderState].text }}</view>
           <view class="button-group">
             <navigator
               class="button"
@@ -104,7 +120,7 @@ onReady(() => {
               再次购买
             </navigator>
             <!-- 待发货状态：模拟发货,开发期间使用,用于修改订单状态为已发货 -->
-            <view v-if="false" class="button"> 模拟发货 </view>
+            <view v-if="false" class="button"> 模拟发货</view>
           </view>
         </template>
       </view>
@@ -115,12 +131,12 @@ onReady(() => {
           <view class="message">
             您已在广州市天河区黑马程序员完成取件，感谢使用菜鸟驿站，期待再次为您服务。
           </view>
-          <view class="date"> 2023-04-14 13:14:20 </view>
+          <view class="date"> 2023-04-14 13:14:20</view>
         </view>
         <!-- 用户收货地址 -->
         <view class="locate">
-          <view class="user"> 张三 13333333333 </view>
-          <view class="address"> 广东省 广州市 天河区 黑马程序员 </view>
+          <view class="user"> 张三 13333333333</view>
+          <view class="address"> 广东省 广州市 天河区 黑马程序员</view>
         </view>
       </view>
 
@@ -153,21 +169,21 @@ onReady(() => {
           <!-- 待评价状态:展示按钮 -->
           <view class="action" v-if="true">
             <view class="button primary">申请售后</view>
-            <navigator url="" class="button"> 去评价 </navigator>
+            <navigator url="" class="button"> 去评价</navigator>
           </view>
         </view>
         <!-- 合计 -->
         <view class="total">
           <view class="row">
-            <view class="text">商品总价: </view>
+            <view class="text">商品总价:</view>
             <view class="symbol">99.00</view>
           </view>
           <view class="row">
-            <view class="text">运费: </view>
+            <view class="text">运费:</view>
             <view class="symbol">10.00</view>
           </view>
           <view class="row">
-            <view class="text">应付金额: </view>
+            <view class="text">应付金额:</view>
             <view class="symbol primary">109.00</view>
           </view>
         </view>
@@ -178,7 +194,8 @@ onReady(() => {
         <view class="title">订单信息</view>
         <view class="row">
           <view class="item">
-            订单编号: {{ query.id }} <text class="copy" @tap="onCopy(query.id)">复制</text>
+            订单编号: {{ query.id }}
+            <text class="copy" @tap="onCopy(query.id)">复制</text>
           </view>
           <view class="item">下单时间: 2023-04-14 13:14:20</view>
         </view>
@@ -192,8 +209,8 @@ onReady(() => {
       <view class="toolbar" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
         <!-- 待付款状态:展示支付按钮 -->
         <template v-if="true">
-          <view class="button primary"> 去支付 </view>
-          <view class="button" @tap="popup?.open?.()"> 取消订单 </view>
+          <view class="button primary"> 去支付</view>
+          <view class="button" @tap="popup?.open?.()"> 取消订单</view>
         </template>
         <!-- 其他订单状态:按需展示按钮 -->
         <template v-else>
@@ -205,11 +222,11 @@ onReady(() => {
             再次购买
           </navigator>
           <!-- 待收货状态: 展示确认收货 -->
-          <view class="button primary"> 确认收货 </view>
+          <view class="button primary"> 确认收货</view>
           <!-- 待评价状态: 展示去评价 -->
-          <view class="button"> 去评价 </view>
+          <view class="button"> 去评价</view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
-          <view class="button delete"> 删除订单 </view>
+          <view class="button delete"> 删除订单</view>
         </template>
       </view>
     </template>

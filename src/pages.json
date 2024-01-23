@@ -156,6 +156,12 @@
             // 隐藏默认导航
             "navigationBarTextStyle": "white"
           }
+        },
+        {
+          "path": "payment/payment",
+          "style": {
+            "navigationBarTitleText": "支付结果页"
+          }
         }
       ]
     }

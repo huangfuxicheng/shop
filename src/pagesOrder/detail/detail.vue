@@ -97,7 +97,7 @@ const onOrderPay = async () => {
   // 关闭当前页，再跳转支付结果页
   uni.redirectTo({ url: `/pagesOrder/payment/payment?id=${query.id}` })
 }
-
+// 是否为开发环境
 const isDev = import.meta.env.DEV
 
 // 模拟发货
@@ -159,7 +159,7 @@ const onOrderSend = async () => {
               再次购买
             </navigator>
             <!-- 待发货状态：模拟发货,开发期间使用,用于修改订单状态为已发货 -->
-            <view @tap="onOrderSend" v-if="isDev && (order?.orderState as OrderState) === OrderState.DaiFuKuan" class="button"> 模拟发货</view>
+            <view @tap="onOrderSend" v-if="isDev && order.orderState === OrderState.DaiFaHuo" class="button"> 模拟发货</view>
           </view>
         </template>
       </view>
